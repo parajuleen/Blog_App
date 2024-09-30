@@ -1,7 +1,6 @@
 const { User } = require("../models/user.model");
 const { uploadOnCloudinary } = require("../utility/cloudnary");
 const mongoose=require('mongoose')
-const jwt=require('jsonwebtoken')
 
 const registerUsers = async (req, res) => {
   try {
@@ -11,9 +10,11 @@ const registerUsers = async (req, res) => {
       return res.status(400).send("Please fill all the fields");
     }
 
-    const userExists = await User.findOne({ email });
+    const userExists = await User.findOne({
+      $or:[{email},{name}]
+    });
     if (userExists) {
-      return res.status(409).send("User already exists");
+      return res.status(409).send("Name or email already exists.");
     } 
   
 
@@ -22,7 +23,7 @@ const registerUsers = async (req, res) => {
     if (!localFilepath) {
       return res
         .status(400)
-        .json({ message: "Please upload a profile picture" });
+        .json({ message: "Please upload a profile picture." });
     }
 
     const uploadedFile = await uploadOnCloudinary(localFilepath); // returns objects after uploading in cloudinary
@@ -35,8 +36,8 @@ const registerUsers = async (req, res) => {
       profileImage: uploadedFile.secure_url,
     });
 
-    const Token=await user.generateAccessToken()
-    const otp=await user.generateOtp()
+    const accessToken=await user.generateAccessToken()
+      await user.generateOtp()
 
     const createdUser = await User.findById(user._id).select(
       "-password -otp");
@@ -47,7 +48,7 @@ const registerUsers = async (req, res) => {
 
 
     return res.status(200)
-    .cookie("token", Token, {
+    .cookie("accessToken", accessToken, {
       httpOnly: true,
       sameSite: "Lax", // or 'Strict' if you want more security
       secure: false, // since you are on localhost
@@ -63,40 +64,71 @@ const registerUsers = async (req, res) => {
 
 const verifyEmail=async(req,res)=>{
   try {
-    const {otp}=req.body
-    const token=req.cookies.token
+    const id=req.user._id
+    const {otp}=req.body    
 
-    if(!token || !otp){
-      return res.status(401).json({message:"Invalid request"})
+    if(!otp){
+      return res.status(401).json({message:"Otp is required"})
     }
 
-    const decodedtoken= jwt.verify(token,process.env.Access_Token_Secret)
-
     const user= await User.findById({
-      _id:decodedtoken._id
-    })
+      _id:id
+     })
+
+
+
     if(!user){
       return res.status(400).send("User not found")
     }
     
-    const result=user.verifyOtp(otp)
-    if(result){
-      user.isVerified=true
-      user.otp=null,
-      user.otpExpire=null,
-      user.save()
+    const result=await user.verifyOtp(otp)
+    if(result == 'Expired otp'){
+      return res.status(400).send("Otp has expired")
     }
-
-    return res.status(200).send('User verification success')
-    
+    if(result == 'Invalid otp'){
+      return res.status(400).send("Invalid otp")
+    }
+    if(result == 'Verified otp'){
+      user.isVerified = true
+      await user.save()
+      return res.status(200).json({
+          message: "Email verified successfully",
+        })
+    } 
     
   } catch (error) {
     console.log("Something went wrong", error);
     
   }
-
 }
 
+const resendOtp= async(req,res)=>{
+  try {
+    const id=req.user._id
+    const user= await User.findById({
+      _id:id
+    })
+    if(!user){
+      return res.status(400).send("User not found")
+    }
+    const result=await user.generateOtp()
+    if(result.messageId){
+      return res.status(200).json({
+        message: `Code resent to ${result.receiver}`
+      })
+    }
+    else {
+      return res.status(500).json({
+          message: 'Failed to resend code'
+      });
+  }
+    
+  }
+   catch (error) {
+    console.log('error on resending otp',error)
+    
+  }
+}
 
 
 
@@ -254,5 +286,6 @@ module.exports = {
   editProfile,
   logoutUser,
   getUserProfile,
-  verifyEmail
+  verifyEmail,
+  resendOtp
 };

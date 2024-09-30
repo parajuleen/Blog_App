@@ -1,7 +1,7 @@
 const nodemailer=require('nodemailer')
 
 const sendOtp= async (email,otp)=>{
-    try {
+    
         const transporter=nodemailer.createTransport({
             service:'gmail',
             auth:{
@@ -17,9 +17,16 @@ const sendOtp= async (email,otp)=>{
             text:`Your OTP is ${otp}`
            
         }
-
+        try{
          const info= await transporter.sendMail(mailOptions)
-         return info.response        
+        
+
+
+         return {
+            messageId:info.messageId,
+            receiver:info.envelope.to
+         }
+
     } catch (error) {
         console.log('Error occured in sending otp',error)
         

@@ -50,7 +50,7 @@ const signupSlice=createSlice({
             
         })
         .addCase(registerUser.rejected,(state,actions)=>{
-            state.error=`${actions.payload.message}`
+            state.error=actions.payload.message
             state.loading=false
             state.status=actions.payload.status
         })
@@ -58,3 +58,4 @@ const signupSlice=createSlice({
 })
 
 export const registerReducer=signupSlice.reducer
+export const {resetSignup}=signupSlice.actions

@@ -64,14 +64,14 @@ userSchema.methods.generateOtp=async function(){
 userSchema.methods.verifyOtp=async function(userotp){
     const otp=this.otp
     const otpExpiry=this.otpExpire
-    if(!otp || Date.now() > otpExpiry){
-        return "expired otp"
+    if(Date.now() > otpExpiry){
+        return ('Expired otp')
     }
-    else if(otp=== userotp){
-        return true
+    else if(userotp!=otp){
+        return ('Invalid otp')
     }
     else{
-        return false
+        return('Verified otp')
     }
 
 }

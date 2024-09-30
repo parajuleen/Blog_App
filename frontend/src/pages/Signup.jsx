@@ -1,5 +1,5 @@
 import React, { useState ,useRef} from "react";
-import { registerUser } from "../store/features/signupslice";
+import { registerUser,resetSignup } from "../store/features/signupslice";
 import { Navigate,Link } from "react-router-dom";
 import Error from "../Components/Error";
 import { useDispatch, useSelector } from "react-redux";
@@ -34,7 +34,8 @@ const Signup = () => {
 
   const fileInputRef=useRef( null)
   const [password, setPassword] = useState("password");
-  const {loading,isSuccess,error,status}= useSelector((state) => state.signup);
+  const {loading,isSuccess,error}= useSelector((state) => state.signup);
+  console.log(error)
 
 
   const handleChange = (event, setFieldValue) => {
@@ -59,14 +60,7 @@ const Signup = () => {
 
   return (
     <>
-            {error && <div class="bg-gray-100 h-screen flex items-center justify-center">
-    <div class="bg-white p-8 rounded-lg shadow-lg max-w-md ">
-        <h1 class="text-4xl font-bold text-gray-800 mb-8">{status} -{error}</h1>
-        <Link to='/signup' class="inline-block py-3 px-6 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-semibold" onClick={()=>{
-          dispatch(resetSignup())
-        }}>Try Again</Link>
-    </div>
-</div>}
+        
 
       <div className="flex items-center justify-center flex-col min-h-screen">
         {loading && (
@@ -77,6 +71,7 @@ const Signup = () => {
           <h2 className="text-2xl font-bold mb-6 text-center">
             Create Account
           </h2>
+          {error && <p className="text-red-500 text-center">{error}</p>}
           <Formik
             initialValues={initialValues}
             validationSchema={validationSchema}
