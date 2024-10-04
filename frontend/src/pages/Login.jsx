@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { login,resetEror } from "../store/features/loginSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { Navigate} from "react-router-dom";
+import { Link,Navigate} from "react-router-dom";
 
 
 const Login = () => {
-
   const [password, setPassword] = useState("password");
   const dispatch=useDispatch()
   const isAuthenticated=useSelector(state=>state.login.isAuth)
- const {error,statuscode}=useSelector(state=>state.login)
+ const {error,statuscode,loading}=useSelector(state=>state.login)
 
 
 
@@ -40,11 +39,14 @@ const Login = () => {
     <>
     {isAuthenticated && <Navigate to='/'/>}
     <div className="flex items-center justify-center min-h-screen bg-gray-100 flex-col">
-      <div className="w-full max-w-sm p-8 bg-white shadow-md rounded-lg">
-        <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">
+    {loading && <div className="border-gray-300 h-10 w-10  animate-spin rounded-full border-8 border-t-blue-600 relative top-60" />}
+
+      <div className="w-full max-w-sm p-8 bg-white shadow-md rounded-lg ">
+        <h2 className="text-2xl font-bold mb-4 text-center text-gray-800">
           Login
         </h2>
         
+        { statuscode === 400 &&  <p className="text-red-500 text-xl text-center m-2">{error}</p> }
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label
@@ -108,7 +110,16 @@ const Login = () => {
             Login
           </button>
         </form>
+        {
+            statuscode === 403 &&
+            <div className="message flex flex-col items-center">
+              <p className="text-red-500 text-md mt-2">{error}</p> 
+              <Link to='/verify-email' className="text-xl font-bold text-blue-400 mx-2 hover: text-blue-600 hover:cursor-pointer underline">Verify</Link>
+            </div>
+            
+           }
       </div>
+     
     </div>
 
     </>

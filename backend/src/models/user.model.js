@@ -33,7 +33,10 @@ const userSchema= new mongoose.Schema(
         isVerified:{
             type:Boolean,
             default:false
-        }
+        },
+       temptoken:{
+        type:String,
+       },
         
     },
     {
@@ -76,7 +79,15 @@ userSchema.methods.verifyOtp=async function(userotp){
 
 }
 
+userSchema.methods.generateTemptoken=async function(){
 
+    const randomToken= await bcrypt.hash(Math.floor(1+Math.random()*100000).toString(),10)
+    console.log(randomToken)
+    this.temptoken=randomToken
+    await this.save()
+    return randomToken
+
+}
 
 userSchema.methods.generateAccessToken = async function(){
     return jwt.sign(

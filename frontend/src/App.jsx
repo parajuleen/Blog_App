@@ -10,7 +10,9 @@ import CreatePost from "../src/pages/CreatePost";
 import Protected from "./Components/Protected";
 import UserProfile from "./pages/UserProfile";
 import Readblogs from "./pages/Readblogs";
-import ViewProfile from "./pages/ViewProfile";
+import ViewProfile from "./pages/ViewProfile"
+import Verifyemail from "./pages/Verifyemail";
+
 const App = () => {
   return (
     <>
@@ -22,11 +24,13 @@ const App = () => {
           <Route path="/contact" element={<Contact />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/verify-email" element={<Verifyemail/>}/>
 
           <Route element={<Protected />}>
             <Route path="/posts" element={<Posts />} />
             <Route path="/posts/:id" element={<Readblogs />} />
             <Route path="/create" element={<CreatePost />} />
+            
             <Route path="/profile" element={<UserProfile />} />
             <Route path="/profile/:name" element={<ViewProfile />} />
           </Route>

@@ -5,8 +5,9 @@ import axios from "axios";
 export const registerUser=createAsyncThunk('register',async(data,{rejectWithValue})=>{
 
   try {
-      const response= await axios.post('http://localhost:5000/api/user/register',data)
-      console.log(response.data)
+      const response= await axios.post('http://localhost:5000/api/user/register',data,{
+        withCredentials:true
+      })
       return response.data
   } catch (error) {
 
@@ -23,7 +24,7 @@ const initialState={
     loading:false,
     error:null,
     signupData:null,
-    isSuccess:false,
+    isSuccess:null,
     status:null
 }
 
@@ -33,7 +34,8 @@ const signupSlice=createSlice({
     name:'signUp',
     initialState,
     reducers:{
-        resetSignup:(state)=>{
+        resetSignup:(state,actions)=>{
+            console.log('Action type for reset signup is',actions)
             state.loading=false,
             state.error=null
         }

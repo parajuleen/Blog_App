@@ -22,8 +22,8 @@ router.route("/logout").post(logoutUser);
 
 router.route("/editProfile").post(verifyUser, editProfile);
 router.route("/getProfile/:name?").get(verifyUser, getUserProfile);
-router.route("/verify-email").post(verifyUser,verifyEmail)
-router.route("/resendOtp").get(verifyUser,resendOtp)
+router.route("/verify-email").post(verifyEmail)
+router.route("/resendOtp").get(resendOtp)
 
 
 module.exports = router;

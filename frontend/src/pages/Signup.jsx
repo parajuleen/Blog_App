@@ -1,6 +1,6 @@
-import React, { useState ,useRef} from "react";
-import { registerUser,resetSignup } from "../store/features/signupslice";
-import { Navigate,Link } from "react-router-dom";
+import React, { useState, useRef } from "react";
+import { registerUser, resetSignup } from "../store/features/signupslice";
+import { Navigate } from "react-router-dom";
 import Error from "../Components/Error";
 import { useDispatch, useSelector } from "react-redux";
 import * as yup from "yup";
@@ -31,11 +31,10 @@ const validationSchema = new yup.ObjectSchema({
 });
 
 const Signup = () => {
+  const fileInputRef = useRef(null);
 
-  const fileInputRef=useRef( null)
   const [password, setPassword] = useState("password");
-  const {loading,isSuccess,error}= useSelector((state) => state.signup);
-  console.log(error)
+  const { loading, isSuccess, error } = useSelector((state) => state.signup);
 
 
   const handleChange = (event, setFieldValue) => {
@@ -54,20 +53,19 @@ const Signup = () => {
       formdata.append("profileImage", values.profileImage);
       dispatch(registerUser(formdata));
     } catch (error) {
-      console.log("user registration failed",error);
+      console.log("user registration failed", error);
     }
   };
 
+
   return (
     <>
-        
-
+        {isSuccess && <Navigate to='/verify-email'/>}
       <div className="flex items-center justify-center flex-col min-h-screen">
         {loading && (
           <div className="border-gray-300 h-20 w-20  animate-spin rounded-full border-8 border-t-blue-600 relative top-64" />
         )}
-        {isSuccess && <Navigate to="/login" />}
-        <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+          <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
           <h2 className="text-2xl font-bold mb-6 text-center">
             Create Account
           </h2>
@@ -77,7 +75,7 @@ const Signup = () => {
             validationSchema={validationSchema}
             onSubmit={onSubmit}
           >
-            {({ setFieldValue, setTouched,values }) => (
+            {({ setFieldValue, setTouched, values }) => (
               <Form encType="multipart/form-data">
                 <div className="mb-4">
                   <label htmlFor="name" className="block text-gray-700">
@@ -131,7 +129,6 @@ const Signup = () => {
                     Upload Image
                   </label>
                   <input
-                
                     type="file"
                     id="image"
                     name="profileImage"
@@ -149,69 +146,44 @@ const Signup = () => {
                   />
                   <Error name="profileImage" />
 
-
-                  {
-  values.profileImage ? (
-    <span
-      id="badge-dismiss-default"
-      className="inline-flex items-center px-2 py-1 mt-2 text-sm font-medium text-blue-800 bg-red-100 rounded dark:bg-blue-900 dark:text-blue-300"
-    >
-      {values.profileImage.name}
-      <button
-        type="button"
-        className="inline-flex items-center p-1 ms-2 text-sm text-blue-400 bg-transparent rounded-sm hover:bg-red-200 hover:text-red-900 dark:hover:bg-blue-800 dark:hover:text-blue-300"
-        data-dismiss-target="#badge-dismiss-default"
-        aria-label="Remove"
-        onClick={() => {
-          setFieldValue("profileImage", null);
-          if (fileInputRef.current) {
-            fileInputRef.current.value = null;
-          }
-        }}
-      >
-        <svg
-          className="w-2 h-2"
-          aria-hidden="true"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 14 14"
-        >
-          <path
-            stroke="currentColor"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
-          />
-        </svg>
-      </button>
-    </span>
-  ) : (
-    ""
-  )
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+                  {values.profileImage ? (
+                    <span
+                      id="badge-dismiss-default"
+                      className="inline-flex items-center px-2 py-1 mt-2 text-sm font-medium text-blue-800 bg-red-100 rounded dark:bg-blue-900 dark:text-blue-300"
+                    >
+                      {values.profileImage.name}
+                      <button
+                        type="button"
+                        className="inline-flex items-center p-1 ms-2 text-sm text-blue-400 bg-transparent rounded-sm hover:bg-red-200 hover:text-red-900 dark:hover:bg-blue-800 dark:hover:text-blue-300"
+                        data-dismiss-target="#badge-dismiss-default"
+                        aria-label="Remove"
+                        onClick={() => {
+                          setFieldValue("profileImage", null);
+                          if (fileInputRef.current) {
+                            fileInputRef.current.value = null;
+                          }
+                        }}
+                      >
+                        <svg
+                          className="w-2 h-2"
+                          aria-hidden="true"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 14 14"
+                        >
+                          <path
+                            stroke="currentColor"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
+                          />
+                        </svg>
+                      </button>
+                    </span>
+                  ) : (
+                    ""
+                  )}
                 </div>
                 <div className="flex items-center justify-between">
                   <button
@@ -225,6 +197,10 @@ const Signup = () => {
             )}
           </Formik>
         </div>
+        
+
+        
+        
       </div>
     </>
   );
